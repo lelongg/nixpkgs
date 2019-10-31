@@ -3,7 +3,8 @@
 , pythonSupport ? stdenv.buildPlatform == stdenv.hostPlatform
 , icuSupport ? false, icu ? null
 , enableShared ? stdenv.hostPlatform.libc != "msvcrt"
-, enableStatic ? !enableShared,
+, enableStatic ? !enableShared
+, fetchpatch
 }:
 
 stdenv.mkDerivation rec {
@@ -35,6 +36,13 @@ stdenv.mkDerivation rec {
     (lib.enableFeature enableShared "shared")
     (lib.withFeature icuSupport "icu")
     (lib.withFeatureAs pythonSupport "python" python)
+  ];
+
+  patches = [
+    (fetchpatch {
+       url = https://src.fedoraproject.org/rpms/libxml2/raw/master/f/libxml2-2.9.8-python3-unicode-errors.patch;
+       sha256 = "1p64ngqk2n6fbrnmvl515ynvzsp32yn99fkixd8crj9n2xrgzf60";
+    })
   ];
 
   enableParallelBuilding = true;
